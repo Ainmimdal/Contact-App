@@ -62,12 +62,12 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
-    super.initState();
-    FirebaseDatabase database = new FirebaseDatabase();
-    database.setPersistenceEnabled(true);
-    database.setPersistenceCacheSizeBytes(10000000);    
+    super.initState();  
     this.checkAuthemtication();
     this.getUser();
+    FirebaseDatabase database = new FirebaseDatabase();
+    database.setPersistenceEnabled(true);
+    database.setPersistenceCacheSizeBytes(10000000);  
   }
 
   @override
