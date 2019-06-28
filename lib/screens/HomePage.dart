@@ -12,10 +12,12 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   //init firebase auth
-  final FirebaseAuth _auth = FirebaseAuth.instance; //Create connection with firebase
+  final FirebaseAuth _auth =
+      FirebaseAuth.instance; //Create connection with firebase
   bool isUserIdNull = true;
   FirebaseUser user;
   bool isSignedIn = false;
+
   checkAuthemtication() async {
     _auth.onAuthStateChanged.listen((user) {
       if (user == null) {
@@ -61,6 +63,9 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    FirebaseDatabase database = new FirebaseDatabase();
+    database.setPersistenceEnabled(true);
+    database.setPersistenceCacheSizeBytes(10000000);    
     this.checkAuthemtication();
     this.getUser();
   }
@@ -73,7 +78,7 @@ class _HomePageState extends State<HomePage> {
         actions: <Widget>[
           IconButton(
             tooltip: "Logout",
-            onPressed: (){
+            onPressed: () {
               signOut();
             },
             icon: Icon(Icons.exit_to_app),
@@ -81,60 +86,65 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body:Center(
-              child: isUserIdNull ? CircularProgressIndicator() : Container(
-          child: FirebaseAnimatedList(
-            query: _databaseReference.child(user.uid),
-            itemBuilder: (BuildContext contxt, DataSnapshot snapshot,
-                Animation<double> animation, int index) {
-              return GestureDetector(
-                onTap: () {
-                  navigateToViewScreen(snapshot.key, user.uid);
-                },
-                child: Card(
-                  color: Colors.white,
-                  elevation: 2.0,
-                  child: Container(
-                    margin: EdgeInsets.all(10.0),
-                    child: Row(
-                      children: <Widget>[
-                        Container(
-                          width: 50.0,
-                          height: 50.0,
-                          decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              image: DecorationImage(
-                                fit: BoxFit.cover,
-                                image: snapshot.value['photoUrl'] == "empty"
-                                    ? AssetImage("images/logo.png")
-                                    : NetworkImage(snapshot.value['photoUrl']),
-                              )),
-                        ),
-                        Container(
-                          margin: EdgeInsets.all(20.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+      body: Center(
+        child: isUserIdNull
+            ? CircularProgressIndicator()
+            : Container(
+                child: FirebaseAnimatedList(
+                  query: _databaseReference.child(user.uid),
+                  itemBuilder: (BuildContext contxt, DataSnapshot snapshot,
+                      Animation<double> animation, int index) {
+                    return GestureDetector(
+                      onTap: () {
+                        navigateToViewScreen(snapshot.key, user.uid);
+                      },
+                      child: Card(
+                        color: Colors.white,
+                        elevation: 2.0,
+                        child: Container(
+                          margin: EdgeInsets.all(10.0),
+                          child: Row(
                             children: <Widget>[
-                              Text(
-                                "${snapshot.value['firstName']} ${snapshot.value['lastName']}",
-                                style: TextStyle(
-                                    fontSize: 20.0, fontWeight: FontWeight.bold),
+                              Container(
+                                width: 50.0,
+                                height: 50.0,
+                                decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    image: DecorationImage(
+                                      fit: BoxFit.cover,
+                                      image:
+                                          snapshot.value['photoUrl'] == "empty"
+                                              ? AssetImage("images/logo.png")
+                                              : NetworkImage(
+                                                  snapshot.value['photoUrl']),
+                                    )),
                               ),
-                              Text(
-                                "${snapshot.value['phone']}",
-                                style: TextStyle(fontSize: 15.0),
+                              Container(
+                                margin: EdgeInsets.all(20.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    Text(
+                                      "${snapshot.value['firstName']} ${snapshot.value['lastName']}",
+                                      style: TextStyle(
+                                          fontSize: 20.0,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text(
+                                      "${snapshot.value['phone']}",
+                                      style: TextStyle(fontSize: 15.0),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ],
                           ),
                         ),
-                      ],
-                    ),
-                  ),
+                      ),
+                    );
+                  },
                 ),
-              );
-            },
-          ),
-        ),
+              ),
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
